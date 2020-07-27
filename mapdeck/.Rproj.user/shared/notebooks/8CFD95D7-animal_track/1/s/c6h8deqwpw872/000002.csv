@@ -1,0 +1,14 @@
+"0","mapdeck(token = key, style = mapdeck_style('dark')) %>%
+  add_arc(
+    data = movement_data, 
+    origin = c(""start_long"", ""start_lat""),
+    destination = c(""end_long"", ""end_lat""),
+    tooltip = ""individual_local_identifier"",
+    stroke_from = ""individual_local_identifier"",
+    stroke_to = ""individual_local_identifier"",
+    layer_id = 'arclayer'
+  )
+"
+"2","Error in resolve_od_data(data, l, origin, destination) : 
+  object 'movement_data' not found
+"

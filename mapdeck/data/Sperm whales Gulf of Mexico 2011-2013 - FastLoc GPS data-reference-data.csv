@@ -1,0 +1,19 @@
+tag-id,animal-id,animal-taxon,deploy-on-date,deploy-off-date,animal-life-stage,animal-sex,attachment-type,deploy-on-latitude,deploy-on-longitude,deployment-id,manipulation-type,tag-manufacturer-name,tag-model,tag-readout-method
+2011GoM-MK10-00840,2011GoM-Pma-05826,Physeter macrocephalus,2011-07-10 20:34:00.000,2011-07-23 17:40:25.000,adult, ,implant,28.36485,-89.10931,2011GoM-00840,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-04177,2011GoM-Pma-00832,Physeter macrocephalus,2011-07-11 15:53:00.000,2011-08-15 11:04:12.000,adult, ,implant,28.3982,-89.10878,2011GoM-04177,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-05640,2011GoM-Pma-05640,Physeter macrocephalus,2011-07-11 18:40:00.000,2011-07-29 15:39:44.000,adult, ,implant,28.41358,-89.06413,2011GoM-05640,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-04173,2011GoM-Pma-00823,Physeter macrocephalus,2011-07-17 19:00:00.000,2011-08-28 02:57:38.000,adult,f,implant,28.47498,-88.63145,2011GoM-04173,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-00838,2011GoM-Pma-00838,Physeter macrocephalus,2011-07-17 21:01:00.000,2011-08-07 10:48:05.000,adult, ,implant,28.46936,-88.59703,2011GoM-00838,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-05654,2011GoM-Pma-05654,Physeter macrocephalus,2011-07-17 21:52:00.000,2011-08-21 02:28:51.000,adult, ,implant,28.44863,-88.56332,2011GoM-05654,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-00833,2011GoM-Pma-00845,Physeter macrocephalus,2011-07-20 19:20:00.000,2011-08-15 02:17:29.000,adult, ,implant,28.54421,-88.02514,2011GoM-00833,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-05685,2011GoM-Pma-05921,Physeter macrocephalus,2011-07-20 19:50:00.000,2011-08-18 04:35:15.000,adult,f,implant,28.53905,-88.02323,2011GoM-05685,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-05644,2011GoM-Pma-05910,Physeter macrocephalus,2011-07-23 15:55:00.000,2011-08-22 13:07:24.000,adult,f,implant,28.55545,-88.81815,2011GoM-05644,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-05701,2011GoM-Pma-05655,Physeter macrocephalus,2011-07-23 17:08:00.000,2011-08-17 03:22:30.000,adult,f,implant,28.55273,-88.80983,2011GoM-05701,none,Wildlife Computers,MK10 PAT,satellite
+2011GoM-MK10-05838,2010GoM-Pma-00849,Physeter macrocephalus,2011-07-23 20:04:00.000,2011-08-02 11:12:04.000,adult,f,implant,28.53992,-88.78056,2011GoM-05838,none,Wildlife Computers,MK10 PAT,satellite
+2013GoM-MK10-00833,2003GoM-Pma-00843,Physeter macrocephalus,2013-07-10 18:55:00.000,2013-07-28 10:42:21.000,adult,f,implant,28.05697,-89.61293,2013GoM-00833,none,Wildlife Computers,MK10 PAT,satellite
+2013GoM-MK10-00840,2013GoM-Pma-00840,Physeter macrocephalus,2013-07-14 19:38:00.000,2013-08-08 19:38:00.000,adult, ,implant,28.80306,-88.30253,2013GoM-00840,none,Wildlife Computers,MK10 PAT,satellite
+2013GoM-MK10-05640,2013GoM-Pma-05640,Physeter macrocephalus,2013-07-29 18:26:00.000,2013-08-21 17:26:00.000,adult, ,implant,29.11204,-87.75478,2013GoM-05640,none,Wildlife Computers,MK10 PAT,satellite
+2013GoM-MK10-05790,2013GoM-Pma-05790,Physeter macrocephalus,2013-07-30 16:18:00.000,2013-07-31 10:15:00.000,adult, ,implant,28.91024,-88.32565,2013GoM-05790,none,Wildlife Computers,MK10 PAT,satellite
+2013GoM-MK10-05654,2010GoM-Pma-05800,Physeter macrocephalus,2013-08-02 23:06:00.000,2013-08-21 20:04:00.000,adult,m,implant,28.83822,-88.35561,2013GoM-05654,none,Wildlife Computers,MK10 PAT,satellite
+2013GoM-MK10-05838,2003GoM-Pma-00843,Physeter macrocephalus,2013-08-04 21:08:00.000,2013-08-21 19:22:23.000,adult,f,implant,28.35447,-89.09283,2013GoM-05838,none,Wildlife Computers,MK10 PAT,satellite
+2013GoM-MK10-05701,2013GoM-Pma-05701,Physeter macrocephalus,2013-08-05 21:17:00.000,2013-08-21 22:08:00.000,adult,f,implant,27.75784,-89.63947,2013GoM-05701,none,Wildlife Computers,MK10 PAT,satellite

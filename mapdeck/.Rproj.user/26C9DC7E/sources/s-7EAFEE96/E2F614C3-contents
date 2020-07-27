@@ -1,0 +1,88 @@
+library(shiny)
+library(shinydashboard)
+library(shinydashboardPlus)
+library(shinyWidgets)
+library(shinycssloaders)
+library(tidyverse)
+library(dbplyr)
+library(TTR)
+library(lubridate)
+library(zoo)
+library(xts)
+library(DBI)
+library(RMySQL)
+library(scales)
+library(RMariaDB)
+library(highcharter)
+library(padr)
+library(DT)
+library(htmltools)
+
+# Data Base Connection
+conn <- dbConnect(MySQL(), 
+                 user = "jarvisalgoritma",
+                 password = "Jarvis@2020",
+                 dbname = "jarvis-algoritma",
+                 host = "api.jarvisasset.com")
+
+con <- conn
+
+ con2 <- dbConnect(MySQL(),
+                  user = "Alvin",
+                  password = "Incorrect123",
+                  dbname = "researchdb",
+                  host = "192.168.10.83")
+
+
+
+stock_absolute_table <- readRDS(file = "scoring/stock_table.RDS")
+FS.Sector.Growth.Q <- readRDS( file = "scoring/sector_q.RDS")
+FS.Sector.Growth.A <- readRDS(file = "scoring/sector_a.RDS")
+stock_absolute_long <- readRDS( file = "scoring/stock_abs.RDS")
+stock_class_long <- readRDS(file = "scoring/stock_class.RDS")
+
+# source("Financial Model/nf_script.R")
+# source("Financial Model/financial_script.R")
+
+
+# Financial Modeling
+
+source("Financial Model/nf_script.R")
+source("Financial Model/financial_script.R")
+
+# Tools
+source("Tools/tools_pe_val.R")
+source("Tools/screen_tool.R")
+
+# Market Monitor
+source("Market Monitor/market_monitor.R")
+
+choice_table_nf <- c("Key Assumption" , "Income Statement", "Balance Sheet",  "Retained Earnings",  "Cash Flow",  
+                     "Cost Break Down", "Associate Investment", "Other Balance Sheet")
+
+choice_table_f <- c("Macro Assumption", "Company Assumption", "Income Statement", "Balance Sheet", "Equity Breakdown", "Funding", "Lending",            
+                    "Deposit",  "NIM",  "Non Interest Income", "Opex",  "Balance Sheet Ratio", "Capital Adequacy",    "Dupont")
+
+# choice_group <- tbl(con, "lv2_stocks") %>% 
+#   collect() %>% 
+#   select_at(vars(matches("Group"))) %>% 
+#   names()
+
+cat("--- Load data for screen tools ---\n")
+
+fs_stocks_annual <- tbl(con, "lv3_fs_stocks_annual") %>% 
+        filter(Date >= "2019-01-01") %>% 
+        collect() %>% 
+        mutate(Date = ymd(Date))
+
+fs_stocks_quarter <- tbl(con, "lv3_fs_stocks_quarter") %>% 
+        filter(Date >= "2019-01-01") %>% 
+        collect() %>% 
+        mutate(Date = ymd(Date))
+
+fs_stocks_consensus <- tbl(con, "lv3_fs_stocks_consensus") %>% 
+        filter(Date >= "2019-01-01") %>% 
+        collect() %>% 
+        mutate(Date = ymd(Date))
+
+current_year <- Sys.time() %>% year()
