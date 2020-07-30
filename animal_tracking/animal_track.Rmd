@@ -8,6 +8,7 @@ output:
    toc_float: true
    code_folding: 'hide'
    highlight: zenburn
+   df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -442,7 +443,7 @@ If you want more charming visualization and get the feel of the movement from ea
 
 ```{r}
 mapdeck(token = key, style = mapdeck_style("satellite")) %>% 
-  add_arc(
+  add_animated_arc(
     data = movement_gps, 
     origin = c("start_long", "start_lat"),
     destination = c("end_long", "end_lat"),
