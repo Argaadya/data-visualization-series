@@ -194,7 +194,7 @@ leaflet(covid_leaflet) %>%
     labels = Kasus_Terkonfirmasi_Akumulatif,
     labFormat = labelFormat(transform = function(x) round(10^x)),
     opacity = 1,
-    title = "Cumulative Active Cases",
+    title = "Cumulative Confirmed Cases",
     position = "bottomright"
   )
 ```
