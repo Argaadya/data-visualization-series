@@ -1,0 +1,260 @@
+---
+title: "Reporting Covid-19 Cases with Geospatial Data"
+author: "Arga Adyatama"
+date: "10/23/2020"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F, out.width = "100%", fig.align = "center")
+```
+
+On this post, I would like to visualize Covid-19 cases with geospatial data with data from Indonesia. I will also try out the [`geogrid` package](https://github.com/jbaileyh/geogrid) that transform map data into grid-like structures.
+
+# Library and Setup
+
+The required packages are as follows:
+
+```{r message=FALSE}
+# Data Wrangling
+library(httr)
+library(jsonlite)
+library(lubridate)
+library(tidyverse)
+
+# Geospatial 
+library(geogrid)
+library(sf)
+
+# Visualization
+library(scales)
+library(leaflet)
+library(glue)
+
+options(scipen = 999)
+
+theme_set(theme_void())
+```
+
+# Import Data
+
+Data for Covid-19 cases in Province/State level in Indonesia can be acquired from [National Disaster Management Agency (BNPB)](https://bnpb-inacovid19.hub.arcgis.com/datasets/statistik-harian-per-provinsi-covid19-indonesia-rev/). The data can be pulled via API from ArcGIS system. If you want to play with the global data or US data, you can visit the [CSSE](https://github.com/CSSEGISandData/COVID-19).
+
+```{r message=FALSE}
+query <- "https://opendata.arcgis.com/datasets/685be21cd0034247b5ceeac996d947fe_0.geojson"
+
+covid_query <- GET(query)
+
+covid_content <- content(covid_query, "text")
+
+list_table <- fromJSON(covid_content, flatten = T)
+
+covid_data <- list_table$features
+
+tail(covid_data)
+```
+
+# Shapefile Data
+
+The shapefile data to build the map can be acquired from [GADM](https://gadm.org/download_country_v3.html). Since I only have data for Province level, the layer is the level 1.
+
+```{r}
+idn <- st_read(dsn = "gadm36_IDN_shp", layer = "gadm36_IDN_1")
+
+plot(idn$geometry)
+```
+
+# Data Preprocessing
+
+The next step is to do data cleansing. We also need to rename some Province/State to match the Province name from the geospatial data.
+
+```{r message=FALSE, warning=FALSE}
+covid_data <- covid_data %>% 
+  setNames(
+    names(covid_data) %>% 
+      str_remove_all("properties[.]")
+  ) %>% 
+  mutate(Tanggal = ymd_hms(Tanggal),
+         CFR_Harian = as.numeric(CFR_Harian),
+         RI_Harian = as.numeric(RI_Harian),
+         Provinsi = case_when(str_detect(Provinsi, "Bangka") ~ "Bangka Belitung",
+                              str_detect(Provinsi, "DKI") ~ "Jakarta Raya",
+                              str_detect(Provinsi, "Yogya") ~ "Yogyakarta",
+                              TRUE ~ Provinsi
+                              )
+         ) 
+
+head(covid_data)
+```
+
+Now we can join the Covid-19 data with the geospatial data. We will only visualize the latest information and only consider the last updated date.
+
+```{r}
+# Filter data
+covid_latest <- covid_data %>% 
+  filter(Tanggal == max(Tanggal))
+
+# Join data
+covid_join <- covid_latest %>% 
+  left_join(idn, by = c("Provinsi" = "NAME_1")) %>% 
+  drop_na(GID_0) %>% 
+  st_as_sf()
+
+covid_join
+```
+
+# Visualization
+
+After the data is complete, now we can start to visualize the data. We can use different approach for visualization : either we want a static map or an interactive map. The static map can be built using the `ggplot2` package while the interactive map can be built using `leaflet`.
+
+## `ggplot2`
+
+Here I want to visualize the daily addition of active case to see which province that has high number of new cases and which one has no more new cases. The province of Jakarta has the highest number of new cases addtion even though it is relatively small in area. The province of Jambi and West Kalimantan has no new case and now are decreasing in number of cases.
+
+```{r}
+covid_join %>% 
+  ggplot(aes(fill = Penambahan_Harian_Kasus_Terkonf)) +
+  geom_sf(color = "gray", lwd = 0.1) +
+  labs(title = "Indonesia Covid-19 Daily Active Case Addition",
+       fill = "Daily Active Case Addition") +
+  scale_fill_gradient2(low = "dodgerblue4", high = "firebrick4", mid = "lightyellow",
+                       label = number_format()
+                       ) +
+  theme(legend.position = "bottom",
+        legend.key.height = unit(2, "mm"),
+        legend.key.width = unit(15, "mm")
+        )
+```
+
+We can also see the daily CFR (Case Fatality Rate) of each province to see the severity of the local outbreak. The East Java has the highest Case Fatality Rate. Compared to other province, Jakarta has relatively low CFR.
+
+```{r}
+covid_join %>% 
+  ggplot(aes(fill = CFR_Harian)) +
+  geom_sf(color = "gray", lwd = 0.1) +
+  labs(title = "Indonesia Covid-19 Daily CFR",
+       fill = "Daily CFR") +
+  scale_fill_binned(low = "lightyellow", high = "firebrick4") +
+  theme(legend.position = "bottom",
+        legend.key.height = unit(2, "mm"),
+        legend.key.width = unit(15, "mm")
+        )
+```
+
+## `leaflet`
+
+You can build interactive map using leaflet. With interactive map, you can give more information for user that cannot be presented directly into the static map.
+
+To reduce the file size, I simplify the polygon's geometry using the `st_simplify()` function. You can skip this part if you want.
+
+```{r}
+covid_leaflet <- covid_join %>%  
+  st_simplify(preserveTopology = T, dTolerance = 0.001)
+```
+
+Finally, we create the leaflet plot.
+
+```{r}
+# Create color pallete
+pal <- colorNumeric(palette = "Reds", domain = log(covid_leaflet$Kasus_Terkonfirmasi_Akumulatif, base = 10))
+
+# Create Label Tooltip
+labels <- glue("
+  <b>{covid_leaflet$Provinsi}</b><br>
+  Last Update : {covid_leaflet$Tanggal} <br>
+  Cumulative Confirmed Cases : {prettyNum(covid_leaflet$Kasus_Terkonfirmasi_Akumulatif, big.mark = ',')} <br>
+  Cumulative Death : {prettyNum(covid_leaflet$Kasus_Meninggal_Akumulatif, big.mark = ',')} <br>
+  Cumulative Recovery : {prettyNum(covid_leaflet$Kasus_Sembuh_Akumulatif, big.mark = ',')} <br>
+  Daily CFR : {round(covid_leaflet$CFR_Harian, 2)}
+  "
+) %>% lapply(htmltools::HTML)
+
+leaflet(covid_leaflet) %>% 
+  addProviderTiles(providers$CartoDB.DarkMatter) %>% 
+  addPolygons(
+    label = labels,
+    fillColor = ~pal(log(Kasus_Terkonfirmasi_Akumulatif, base = 10)),
+    fillOpacity = .8,
+    weight = 2,
+    color = "white",
+    highlight = highlightOptions(
+      weight = 5,
+      color = "black", 
+      bringToFront = TRUE,
+      opacity = 0.8
+    )
+  ) %>% 
+    addLegend(
+    pal = pal,
+    values = ~log(Kasus_Terkonfirmasi_Akumulatif, 10), 
+    labels = Kasus_Terkonfirmasi_Akumulatif,
+    labFormat = labelFormat(transform = function(x) round(10^x)),
+    opacity = 1,
+    title = "Cumulative Active Cases",
+    position = "bottomright"
+  )
+```
+
+## `geogrid`
+
+An alternative way to present the map is by constructing a grid instead of the actual map. We can do this using the geogrid package. To make a grid from the shapefile data, you can use the `calculate_grid()` function. There are 2 varianst of grid : hexagonal and regular (rectangle). 
+
+The geogrid package use the hungarian algorithm to efficiently calculate the assignments from the original geography to the new geography. This involves identifying the solution where the total distance between the centroid of every original geography and its new centroid on the grid is minimised. The learning rate will control the rate at which the gradient descent finds the optimum cellsize to ensure that your gridded points fit within the outer boundary of the input polygons.
+
+```{r message=FALSE, warning=FALSE}
+new_grid <- calculate_grid(shape = covid_join, 
+                           seed = 123, 
+                           grid_type = "hexagonal", 
+                           learning_rate = 0.01
+                           )
+
+# assign the grid to the data
+resulthex <- assign_polygons(covid_join, new_grid)
+```
+
+The visualization step for the geogrid result is the same with the usual ggplot2 visualization, just replace the dataset.
+
+```{r}
+resulthex %>% 
+  ggplot(aes(fill = Penambahan_Harian_Kasus_Terkonf)) +
+  geom_sf(color = "gray", lwd = 0.1) +
+  labs(title = "Indonesia Covid-19 Daily Active Case Addition",
+       fill = "Daily Active Case Addition") +
+  scale_fill_gradient2(low = "dodgerblue4", high = "firebrick4", mid = "lightyellow",
+                       label = number_format()
+                       ) +
+  theme(legend.position = "bottom",
+        legend.key.height = unit(2, "mm"),
+        legend.key.width = unit(15, "mm")
+        )
+```
+
+You can switch to rectangular grid as well.
+
+```{r message=FALSE, warning=FALSE}
+new_grid <- calculate_grid(shape = covid_join, 
+                           seed = 123, 
+                           grid_type = "regular", 
+                           learning_rate = 0.01
+                           )
+
+# assign the grid to the data
+resulthex <- assign_polygons(covid_join, new_grid)
+
+resulthex %>% 
+  ggplot(aes(fill = Penambahan_Harian_Kasus_Terkonf)) +
+  geom_sf(color = "gray", lwd = 0.1) +
+  labs(title = "Indonesia Covid-19 Daily Active Case Addition",
+       fill = "Daily Active Case Addition") +
+  scale_fill_gradient2(low = "dodgerblue4", high = "firebrick4", mid = "lightyellow",
+                       label = number_format()
+                       ) +
+  theme(legend.position = "bottom",
+        legend.key.height = unit(2, "mm"),
+        legend.key.width = unit(15, "mm")
+        )
+```
