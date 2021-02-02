@@ -6,3 +6,4 @@ Collection of data visualization project
 - [Replicating interactive plot from five thirty eight](https://github.com/Argaadya/data-visualization-series/tree/master/interactive_five_thirty_eight)
 - [Building Attractive Table with reactable](https://github.com/Argaadya/data-visualization-series/tree/master/reactable)
 - [Basic Exploratory Data Analysis with matplotlib](https://github.com/Argaadya/data-visualization-series/tree/master/basic_matplotlib)
+- [Interactive Plotting with plotly in python](https://github.com/Argaadya/data-visualization-series/tree/master/plotly_python)
